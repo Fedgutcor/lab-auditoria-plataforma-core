@@ -1,0 +1,163 @@
+{
+  "name": "Lab Auditoría — 01 Flujo Lineal (cadena de auditores)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-1",
+      "name": "Disparador Manual",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [220, 380]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "evidencia_url",
+              "type": "string",
+              "value": "https://raw.githubusercontent.com/Fedgutcor/lab-auditoria-plataforma-core/main/copilot-studio/evidencia-completa.md"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "config-1",
+      "name": "Configurar",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [440, 380]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.evidencia_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text",
+              "outputPropertyName": "data"
+            }
+          }
+        }
+      },
+      "id": "http-1",
+      "name": "Descargar Evidencia",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 380]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un auditor senior de AppSec (15 años de experiencia). Audita de forma independiente y exhaustiva la evidencia provista. Evalúa y reporta: (1) secretos/credenciales hardcoded o filtradas; (2) dependencias vulnerables (CVEs) y debilidades de cadena de suministro; (3) patrones inseguros de código; (4) configuración de CI/CD: permisos excesivos, secretos expuestos.\n\nComienza tu respuesta con la línea: ## REPORTE SEGURIDAD\n\nPor cada hallazgo: Severidad [Crítica/Alta/Media/Baja], Ubicación (archivo:línea), Impacto, Remediación. Cierra con Resumen Ejecutivo (Top 3 riesgos) y veredicto. No inventes hallazgos sin sustento en la evidencia.\n\n--- EVIDENCIA ---\n{{ $json.data }}"
+      },
+      "id": "aud-sec",
+      "name": "Auditor Seguridad",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [900, 380]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un auditor independiente de privacidad, cumplimiento normativo y propiedad intelectual (DPO + abogado de PI). Este es el reporte del auditor que revisó el proyecto antes que tú:\n\n--- REPORTE ANTERIOR ---\n{{ $json.text }}\n--- FIN DEL REPORTE ANTERIOR ---\n\nAhora realiza TU auditoría de la evidencia. Evalúa y reporta: (1) PII en código, logs o datos de prueba; (2) licencias de dependencias (contaminación copyleft); (3) manejo de datos; (4) cumplimiento GDPR y Ley 1581 de 2012.\n\nComienza tu respuesta con la línea: ## REPORTE PRIVACIDAD\n\nPor cada hallazgo: Severidad, Ubicación, Norma Afectada, Riesgo, Remediación. Cierra con Resumen Ejecutivo y veredicto de exposición legal.\n\n--- EVIDENCIA ---\n{{ $('Descargar Evidencia').item.json.data }}"
+      },
+      "id": "aud-priv",
+      "name": "Auditor Privacidad",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [1140, 380]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un auditor independiente de gobernanza de IA y calidad de ingeniería. Estos son los reportes de los auditores que revisaron el proyecto antes que tú:\n\n--- REPORTES ANTERIORES ---\n{{ $('Auditor Seguridad').item.json.text }}\n\n{{ $json.text }}\n--- FIN DE LOS REPORTES ANTERIORES ---\n\nAhora realiza TU auditoría de la evidencia. Evalúa y reporta: (1) claves de modelos hardcoded y superficies de prompt-injection; (2) calidad: tests, documentación, deuda técnica; (3) continuidad: bus-factor, dependencias abandonadas, CODEOWNERS.\n\nComienza tu respuesta con la línea: ## REPORTE GOBERNANZA IA\n\nPor cada hallazgo: Severidad, Ubicación, Impacto, Remediación. Cierra con Resumen Ejecutivo y veredicto de madurez de gobernanza de IA.\n\n--- EVIDENCIA ---\n{{ $('Descargar Evidencia').item.json.data }}"
+      },
+      "id": "aud-ai",
+      "name": "Auditor Gobernanza IA",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [1380, 380]
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "groq-1",
+      "name": "Groq (principal)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [1140, 640]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "gemini-1",
+      "name": "Gemini (alternativa / fallback)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [1340, 640]
+    },
+    {
+      "parameters": {
+        "content": "## Setup (2 minutos)\n\n1. API key GRATIS de Groq en console.groq.com → API Keys.\n2. Doble clic en **Groq (principal)** → Credential → New → pega la key.\n3. **Execute workflow**.\n\nPara auditar otro repo: cambia `evidencia_url` en **Configurar**.",
+        "height": 260,
+        "width": 320
+      },
+      "id": "note-setup",
+      "name": "Nota Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [180, 60]
+    },
+    {
+      "parameters": {
+        "content": "## Qué observar (Fig. 1 de la guía)\n\nCada auditor VE los reportes anteriores — el contexto (y el sesgo) viaja por la cadena.\n\nLee el output del **Auditor Privacidad**: ¿cuánto espacio dedica a comentar los hallazgos de seguridad en vez de encontrar los suyos? Eso es **efecto ancla**.\n\nCompara con el workflow **02 Flujo Paralelo**: misma evidencia, mismos prompts base, arquitectura distinta → auditoría distinta.",
+        "height": 320,
+        "width": 360,
+        "color": 5
+      },
+      "id": "note-lesson",
+      "name": "Nota Lección",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1600, 60]
+    }
+  ],
+  "connections": {
+    "Disparador Manual": {
+      "main": [[{ "node": "Configurar", "type": "main", "index": 0 }]]
+    },
+    "Configurar": {
+      "main": [[{ "node": "Descargar Evidencia", "type": "main", "index": 0 }]]
+    },
+    "Descargar Evidencia": {
+      "main": [[{ "node": "Auditor Seguridad", "type": "main", "index": 0 }]]
+    },
+    "Auditor Seguridad": {
+      "main": [[{ "node": "Auditor Privacidad", "type": "main", "index": 0 }]]
+    },
+    "Auditor Privacidad": {
+      "main": [[{ "node": "Auditor Gobernanza IA", "type": "main", "index": 0 }]]
+    },
+    "Groq (principal)": {
+      "ai_languageModel": [[
+        { "node": "Auditor Seguridad", "type": "ai_languageModel", "index": 0 },
+        { "node": "Auditor Privacidad", "type": "ai_languageModel", "index": 0 },
+        { "node": "Auditor Gobernanza IA", "type": "ai_languageModel", "index": 0 }
+      ]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

@@ -1,0 +1,209 @@
+{
+  "name": "Lab Auditoría — 02 Flujo Paralelo (3 auditores + consolidador)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-1",
+      "name": "Disparador Manual",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [220, 380]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "evidencia_url",
+              "type": "string",
+              "value": "https://raw.githubusercontent.com/Fedgutcor/lab-auditoria-plataforma-core/main/copilot-studio/evidencia-completa.md"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "config-1",
+      "name": "Configurar",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [440, 380]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.evidencia_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text",
+              "outputPropertyName": "data"
+            }
+          }
+        }
+      },
+      "id": "http-1",
+      "name": "Descargar Evidencia",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 380]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un auditor senior de AppSec (15 años de experiencia). Audita de forma independiente y exhaustiva la evidencia provista. Evalúa y reporta: (1) secretos/credenciales hardcoded o filtradas; (2) dependencias vulnerables (CVEs) y debilidades de cadena de suministro; (3) patrones inseguros de código; (4) configuración de CI/CD: permisos excesivos, secretos expuestos.\n\nComienza tu respuesta con la línea: ## REPORTE SEGURIDAD\n\nPor cada hallazgo: Severidad [Crítica/Alta/Media/Baja], Ubicación (archivo:línea), Impacto, Remediación. Cierra con Resumen Ejecutivo (Top 3 riesgos) y veredicto de postura de seguridad. No inventes hallazgos sin sustento en la evidencia.\n\n--- EVIDENCIA ---\n{{ $json.data }}"
+      },
+      "id": "aud-sec",
+      "name": "Auditor Seguridad",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [920, 120]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un auditor independiente de privacidad, cumplimiento normativo y propiedad intelectual (DPO + abogado de PI). Audita la evidencia provista. Evalúa y reporta: (1) datos personales o sensibles (PII) en código, logs o datos de prueba; (2) licencias de dependencias: incompatibilidades o contaminación copyleft (GPL/AGPL en propietario); (3) manejo de datos: minimización, retención, procedencia; (4) cumplimiento GDPR y Ley 1581 de 2012 (Colombia).\n\nComienza tu respuesta con la línea: ## REPORTE PRIVACIDAD\n\nPor cada hallazgo: Severidad [Alta/Media/Baja], Ubicación, Norma Afectada, Riesgo Asociado, Remediación. Cierra con Resumen Ejecutivo y veredicto de exposición legal. No inventes hallazgos sin sustento en la evidencia.\n\n--- EVIDENCIA ---\n{{ $json.data }}"
+      },
+      "id": "aud-priv",
+      "name": "Auditor Privacidad",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [920, 380]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un auditor independiente de gobernanza de IA y calidad de ingeniería. Audita la evidencia provista. Evalúa y reporta: (1) gobierno de IA: claves de modelos hardcoded, superficies de prompt-injection (inputs de usuario directo a prompts de LLM sin delimitar), permisos excesivos; (2) calidad: tests, documentación, deuda técnica; (3) continuidad: bus-factor, dependencias abandonadas, CODEOWNERS.\n\nComienza tu respuesta con la línea: ## REPORTE GOBERNANZA IA\n\nPor cada hallazgo: Severidad [Alta/Media/Baja], Ubicación, Impacto, Remediación. Cierra con Resumen Ejecutivo y veredicto de madurez de gobernanza de IA. No inventes hallazgos sin sustento en la evidencia.\n\n--- EVIDENCIA ---\n{{ $json.data }}"
+      },
+      "id": "aud-ai",
+      "name": "Auditor Gobernanza IA",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [920, 640]
+    },
+    {
+      "parameters": {
+        "mode": "append",
+        "numberInputs": 3
+      },
+      "id": "merge-1",
+      "name": "Unir Reportes",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [1220, 380]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Junta los 3 reportes independientes en un solo campo.\nconst reportes = $input.all().map(item => item.json.text || '');\nreturn [{ json: { informe_conjunto: reportes.join('\\n\\n---\\n\\n') } }];"
+      },
+      "id": "code-1",
+      "name": "Empaquetar Reportes",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1420, 380]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Consolida estos 3 reportes independientes de auditoría en un informe ejecutivo unificado para el comité de riesgos.\n\nEl informe final debe incluir:\n1. Resumen de 1 párrafo del enfoque de cada auditor.\n2. Tabla consolidada de hallazgos por severidad (Crítica, Alta, Media, Baja).\n3. Hallazgos convergentes: qué encontraron 2 o más auditores por caminos distintos (evidencia más fuerte).\n4. Top 5 riesgos globales.\n5. Veredicto unificado: [APTO / APTO CON OBSERVACIONES / REQUIERE REVISIÓN / NO APTO].\n6. Plan de remediación priorizado (corto, mediano, largo plazo).\n\n--- REPORTES ---\n{{ $json.informe_conjunto }}"
+      },
+      "id": "consol-1",
+      "name": "Consolidador",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [1620, 380]
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "groq-1",
+      "name": "Groq (principal)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [1180, 820]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "gemini-1",
+      "name": "Gemini (alternativa / fallback)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [1380, 820]
+    },
+    {
+      "parameters": {
+        "content": "## Setup (2 minutos)\n\n1. Crea una API key GRATIS de Groq en console.groq.com → API Keys.\n2. Doble clic en el nodo **Groq (principal)** → Credential → New → pega la key.\n3. Ejecuta con **Execute workflow**.\n\nAlternativa: conecta el nodo **Gemini** (key gratis en aistudio.google.com) a los 4 agentes y elimina el de Groq.",
+        "height": 300,
+        "width": 340
+      },
+      "id": "note-setup",
+      "name": "Nota Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [180, 60]
+    },
+    {
+      "parameters": {
+        "content": "## La lección\n\nEsto es la **Fig. 2 de la guía** (fan-out / fan-in) hecha realidad: los 3 auditores reciben la MISMA evidencia y NO se ven entre sí — no hay flechas entre ellos. Solo el Consolidador ve los 3 reportes.\n\nAquí la evidencia SÍ se descarga por URL (nodo HTTP Request): compara con Copilot Studio, donde enlazar el repo no funciona. **El grounding no se supone, se diseña.**\n\nPara auditar otro repo: cambia `evidencia_url` en **Configurar**.",
+        "height": 340,
+        "width": 360,
+        "color": 4
+      },
+      "id": "note-lesson",
+      "name": "Nota Lección",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1580, 60]
+    }
+  ],
+  "connections": {
+    "Disparador Manual": {
+      "main": [[{ "node": "Configurar", "type": "main", "index": 0 }]]
+    },
+    "Configurar": {
+      "main": [[{ "node": "Descargar Evidencia", "type": "main", "index": 0 }]]
+    },
+    "Descargar Evidencia": {
+      "main": [[
+        { "node": "Auditor Seguridad", "type": "main", "index": 0 },
+        { "node": "Auditor Privacidad", "type": "main", "index": 0 },
+        { "node": "Auditor Gobernanza IA", "type": "main", "index": 0 }
+      ]]
+    },
+    "Auditor Seguridad": {
+      "main": [[{ "node": "Unir Reportes", "type": "main", "index": 0 }]]
+    },
+    "Auditor Privacidad": {
+      "main": [[{ "node": "Unir Reportes", "type": "main", "index": 1 }]]
+    },
+    "Auditor Gobernanza IA": {
+      "main": [[{ "node": "Unir Reportes", "type": "main", "index": 2 }]]
+    },
+    "Unir Reportes": {
+      "main": [[{ "node": "Empaquetar Reportes", "type": "main", "index": 0 }]]
+    },
+    "Empaquetar Reportes": {
+      "main": [[{ "node": "Consolidador", "type": "main", "index": 0 }]]
+    },
+    "Groq (principal)": {
+      "ai_languageModel": [[
+        { "node": "Auditor Seguridad", "type": "ai_languageModel", "index": 0 },
+        { "node": "Auditor Privacidad", "type": "ai_languageModel", "index": 0 },
+        { "node": "Auditor Gobernanza IA", "type": "ai_languageModel", "index": 0 },
+        { "node": "Consolidador", "type": "ai_languageModel", "index": 0 }
+      ]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

@@ -17,6 +17,10 @@ Eres parte de un comité de riesgos. Audita este repositorio con tres miradas in
 
 Pídele a Claude o a GitHub Copilot: *"Audita este repositorio y reporta hallazgos por severidad con archivo:línea y remediación"*. Compara tu informe con el veredicto de la actividad reina.
 
+## Carpeta `n8n/` — la misma orquesta, en n8n
+
+La carpeta [`n8n/`](n8n/) trae dos workflows importables (flujo lineal y flujo paralelo con 3 auditores + consolidador) para replicar el experimento de la clase en n8n con una API key gratis de Groq. Ver su [README](n8n/README.md).
+
 ## Carpeta `copilot-studio/` — para la práctica en Microsoft Copilot Studio
 
 La base de conocimiento (Knowledge) de Copilot Studio no acepta archivos `.js` ni `.env`, así que la carpeta [`copilot-studio/`](copilot-studio/) contiene **copias de los archivos a auditar, ya renombradas** (ej. `assistant.js` → `assistant.js.txt`).
