@@ -7,7 +7,10 @@
       "name": "Disparador Manual",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [220, 380]
+      "position": [
+        220,
+        380
+      ]
     },
     {
       "parameters": {
@@ -27,7 +30,10 @@
       "name": "Configurar",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [440, 380]
+      "position": [
+        440,
+        380
+      ]
     },
     {
       "parameters": {
@@ -45,7 +51,10 @@
       "name": "Descargar Evidencia",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [660, 380]
+      "position": [
+        660,
+        380
+      ]
     },
     {
       "parameters": {
@@ -56,7 +65,10 @@
       "name": "Auditor Seguridad",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.5,
-      "position": [920, 120]
+      "position": [
+        920,
+        120
+      ]
     },
     {
       "parameters": {
@@ -67,7 +79,10 @@
       "name": "Auditor Privacidad",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.5,
-      "position": [920, 380]
+      "position": [
+        920,
+        380
+      ]
     },
     {
       "parameters": {
@@ -78,7 +93,10 @@
       "name": "Auditor Gobernanza IA",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.5,
-      "position": [920, 640]
+      "position": [
+        920,
+        640
+      ]
     },
     {
       "parameters": {
@@ -89,7 +107,10 @@
       "name": "Unir Reportes",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
-      "position": [1220, 380]
+      "position": [
+        1220,
+        380
+      ]
     },
     {
       "parameters": {
@@ -99,7 +120,10 @@
       "name": "Empaquetar Reportes",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1420, 380]
+      "position": [
+        1420,
+        380
+      ]
     },
     {
       "parameters": {
@@ -110,7 +134,10 @@
       "name": "Consolidador",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.5,
-      "position": [1620, 380]
+      "position": [
+        1620,
+        380
+      ]
     },
     {
       "parameters": {
@@ -123,11 +150,14 @@
       "name": "Groq (principal)",
       "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
       "typeVersion": 1,
-      "position": [1180, 820]
+      "position": [
+        1180,
+        820
+      ]
     },
     {
       "parameters": {
-        "modelName": "models/gemini-2.0-flash",
+        "modelName": "models/gemini-2.5-flash",
         "options": {
           "temperature": 0.2
         }
@@ -136,7 +166,10 @@
       "name": "Gemini (alternativa / fallback)",
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
-      "position": [1380, 820]
+      "position": [
+        1380,
+        820
+      ]
     },
     {
       "parameters": {
@@ -148,7 +181,10 @@
       "name": "Nota Setup",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [180, 60]
+      "position": [
+        180,
+        60
+      ]
     },
     {
       "parameters": {
@@ -161,45 +197,136 @@
       "name": "Nota Lección",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [1580, 60]
+      "position": [
+        1580,
+        60
+      ]
     }
   ],
   "connections": {
     "Disparador Manual": {
-      "main": [[{ "node": "Configurar", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Configurar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Configurar": {
-      "main": [[{ "node": "Descargar Evidencia", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Descargar Evidencia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Descargar Evidencia": {
-      "main": [[
-        { "node": "Auditor Seguridad", "type": "main", "index": 0 },
-        { "node": "Auditor Privacidad", "type": "main", "index": 0 },
-        { "node": "Auditor Gobernanza IA", "type": "main", "index": 0 }
-      ]]
+      "main": [
+        [
+          {
+            "node": "Auditor Seguridad",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Auditor Privacidad",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Auditor Gobernanza IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Auditor Seguridad": {
-      "main": [[{ "node": "Unir Reportes", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Unir Reportes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Auditor Privacidad": {
-      "main": [[{ "node": "Unir Reportes", "type": "main", "index": 1 }]]
+      "main": [
+        [
+          {
+            "node": "Unir Reportes",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
     },
     "Auditor Gobernanza IA": {
-      "main": [[{ "node": "Unir Reportes", "type": "main", "index": 2 }]]
+      "main": [
+        [
+          {
+            "node": "Unir Reportes",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
     },
     "Unir Reportes": {
-      "main": [[{ "node": "Empaquetar Reportes", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Empaquetar Reportes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Empaquetar Reportes": {
-      "main": [[{ "node": "Consolidador", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Consolidador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Groq (principal)": {
-      "ai_languageModel": [[
-        { "node": "Auditor Seguridad", "type": "ai_languageModel", "index": 0 },
-        { "node": "Auditor Privacidad", "type": "ai_languageModel", "index": 0 },
-        { "node": "Auditor Gobernanza IA", "type": "ai_languageModel", "index": 0 },
-        { "node": "Consolidador", "type": "ai_languageModel", "index": 0 }
-      ]]
+      "ai_languageModel": [
+        [
+          {
+            "node": "Auditor Seguridad",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Auditor Privacidad",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Auditor Gobernanza IA",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Consolidador",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
