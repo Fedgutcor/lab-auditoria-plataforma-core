@@ -21,4 +21,4 @@ Pídele a Claude o a GitHub Copilot: *"Audita este repositorio y reporta hallazg
 
 La base de conocimiento (Knowledge) de Copilot Studio no acepta archivos `.js` ni `.env`, así que la carpeta [`copilot-studio/`](copilot-studio/) contiene **copias de los archivos a auditar, ya renombradas** (ej. `assistant.js` → `assistant.js.txt`).
 
-Sube a Knowledge **todos los archivos de esa carpeta, tal cual** — y nada más. En particular, **no subas este README**: contiene pistas sobre los hallazgos y sesgaría al auditor (no le des la hoja de respuestas).
+Sube a Knowledge **todos los archivos de esa carpeta, tal cual** — y nada más. ¿Ruta aún más rápida? El archivo [`copilot-studio/evidencia-completa.md`](copilot-studio/evidencia-completa.md) concatena toda la evidencia en un solo documento: sube solo ese archivo, o copia su contenido y pégalo directamente en el chat del agente. En particular, **no subas este README**: contiene pistas sobre los hallazgos y sesgaría al auditor (no le des la hoja de respuestas).
