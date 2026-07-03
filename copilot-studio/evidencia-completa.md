@@ -64,8 +64,8 @@ AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 ```
 name: deploy
 on:
-  push:
-    branches: [main]
+  # Hallazgo: despliegue lanzado a mano, sin gates de revision ni aprobacion por pares
+  workflow_dispatch:
 jobs:
   deploy:
     runs-on: ubuntu-latest
