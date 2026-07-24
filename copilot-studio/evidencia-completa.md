@@ -154,8 +154,8 @@ module.exports = { logger, requestLogger };
 
 ```
 [
-  { "id": 1, "nombre": "Ana Martínez", "cedula": "52123456", "email": "ana.martinez@gmail.com", "telefono": "3104567890" },
-  { "id": 2, "nombre": "Carlos Rojas",  "cedula": "80456789", "email": "carlos.rojas@hotmail.com", "telefono": "3209876543" },
-  { "id": 3, "nombre": "Lucía Gómez",   "cedula": "41098765", "email": "lucia.gomez@yahoo.com",  "telefono": "3151234567" }
+  { "id": 1, "nombre": "Ana Martínez", "cedula": "52123456", "email": "ana.martinez@ejemplo.com", "telefono": "3104567890" },
+  { "id": 2, "nombre": "Carlos Rojas",  "cedula": "80456789", "email": "carlos.rojas@ejemplo.com", "telefono": "3209876543" },
+  { "id": 3, "nombre": "Lucía Gómez",   "cedula": "41098765", "email": "lucia.gomez@ejemplo.com",  "telefono": "3151234567" }
 ]
 ```
